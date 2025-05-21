@@ -2,11 +2,10 @@
 import logo from './assets/logo.svg';
 import { MyComponent } from './MyComponent';
 import styles from './App.module.css';
+import { useState } from 'react';
 
 export const App = () => {
-	// const onClick = () => {
-	// 	console.log(123);
-	// };
+	const [operand1, setOperand1] = useState(0);
 
 	return (
 		<div className={styles.app}>
