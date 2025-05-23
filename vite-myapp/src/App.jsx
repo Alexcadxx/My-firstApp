@@ -1,29 +1,35 @@
 import { useState } from 'react';
 import styles from './App.module.css';
+import { formatDate } from './task1-ready/utils';
 
 export const App = () => {
 	const [value, setValue] = useState('');
 	const [list, setList] = useState([]);
 	const [error, setError] = useState('');
 
+	const correctValue = (val) => val.length >= 3;
+
 	const onInputButtonClick = () => {
-		const promptValue = prompt();
+		const promptValue = prompt('Enter new value');
 		console.log(promptValue);
 
-		if (promptValue && promptValue.length < 3) {
-			setError(error === '');
-		} else {
+		if (correctValue(promptValue)) {
 			setValue(promptValue);
+			setError('');
+		} else {
+			setError('Введенное значение должно содержать минимум 3 символа');
 		}
 	};
 
-	const onAddButtonClick = () => {};
+	const onAddButtonClick = () => {
+		if (!correctValue(value)) return;
+		setList((prev) => [...prev, { id: Date.now(), value, date: new Date() }]);
+		setValue('');
+		setError('');
+	};
 
-	const textError = (
-		<div className={styles.error}>
-			Введенное значение должно содержать минимум 3 символа
-		</div>
-	);
+	const textError = <div className={styles.error}>{error}</div>;
+	const isValueValid = correctValue(value);
 
 	return (
 		<div className={styles.app}>
@@ -33,7 +39,7 @@ export const App = () => {
 				<output className={styles.currentValue}>{value}</output>"
 			</p>
 			{
-				error && textError /* <div className={styles.error}>
+				error !== '' && textError /* <div className={styles.error}>
 				Введенное значение должно содержать минимум 3 символа
 			</div> */
 			}
@@ -41,16 +47,31 @@ export const App = () => {
 				<button className={styles.buttons} onClick={onInputButtonClick}>
 					Ввести новое
 				</button>
-				<button className={styles.buttons} disabled>
+				<button
+					className={styles.buttons}
+					disabled={!isValueValid}
+					onClick={onAddButtonClick}
+				>
 					Добавить в список
 				</button>
 			</div>
 			<div className={styles.listContainer}>
 				<h2 className={styles.listHeading}>Список:</h2>
-				<p className={styles.noMarginText}>Нет добавленных элементов</p>
-				<ul className={styles.list}>
-					<li className={styles.listItem}>Первый элемент</li>
-				</ul>
+				{list.length > 0 ? (
+					<ul className={styles.list}>
+						{list.map((item) => (
+							<li className={styles.listItem} key={item.id}>
+								{item.value} (
+								<time dateTime={item.date.toISOString()}>
+									{formatDate(item.date)}
+								</time>
+								)
+							</li>
+						))}
+					</ul>
+				) : (
+					<p className={styles.noMarginText}>Нет добавленных элементов</p>
+				)}
 			</div>
 		</div>
 	);
